@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+        <record id="wizard_calendar_report" model="ir.ui.view">
+            <field name="name">Attendances Analysis Calendar</field>
+            <field name="model">attendance_analysis.wizard.calendar_report</field>
+            <field name="arch" type="xml">
+                <form string="Attendances Analysis Calendar">
+                    <group col="4" height="400">
+                        <field name="from_date"/>
+                        <field name="to_date"/>
+                        <separator colspan="4" string="Employees"/>
+                        <field name="employee_ids" colspan="4" nolabel="1"/>
+                    </group>
+                    <footer>
+                        <button name="action_print" string="Print" type="object" class="oe_highlight" />
+                         or 
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_wizard_calendar_report" model="ir.actions.act_window">
+            <field name="name">Attendances Report</field>
+            <field name="res_model">attendance_analysis.wizard.calendar_report</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="wizard_calendar_report"/>
+            <field name="target">new</field>
+        </record>
+
+        <menuitem action="action_wizard_calendar_report"
+            id="menu_action_wizard_calendar_report"
+            parent="hr.menu_hr_reporting"
+            sequence="2" />
+    </data>
+</openerp>

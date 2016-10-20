@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+	<data>
+		<record id="swanco_paperformat" model="report.paperformat">
+			<field name="name">Paper Format</field>
+			<field name="default" eval="True"/>
+			<field name="format">custom</field>
+			<field name="page_height">250</field>
+			<field name="page_width">160</field>
+			<field name="orientation">Landscape</field>
+			<field name="margin_top">10</field>
+			<field name="margin_bottom">10</field>
+			<field name="margin_left">3</field>
+			<field name="margin_right">3</field>
+			<field name="header_line" eval="True"/>
+			<field name="header_spacing">20</field>
+			<field name="dpi">80</field>
+		</record>
+		<record id="action_report_hr_attendance_analysis" model="ir.actions.report.xml">
+    		<field name="paperformat_id" ref="swanco_paperformat"/>
+		</record>
+		<report
+			id="action_report_hr_attendance_analysis"
+			model="hr.employee"
+			string="Employee Attendance Analysis"
+			report_type="qweb-pdf"
+			name="hr_attendance_analysis.hr_attendance_analysis_report"
+			attachment_use="True"/>
+		<template id="hr_attendance_analysis_report">
+			<t t-call="report.html_container">
+				<t t-call="report.external_layout">
+					<div class="page" style="font-size:18;">
+						<div class="oe_structure"/>
+						<div class="page-header">
+						</div>
+						<p class="text-right" style="font-size:10;">
+							<span t-esc="print_date()"/>
+						</p>
+						<t t-foreach="employee_ids" t-as="o">
+							<h5>Employee: <span t-esc="o.name"/></h5>
+							<table style="width:100%" border="1">
+								<thead style="border-bottom: solid; background-color: WhiteSmoke">
+									<tr style="page-break-inside: avoid">
+										<th style="font-size:10">Date</th>
+										<th style="font-size:10">Day of week</th>
+										<t t-if="max_per_day &gt;=1">
+											<th style="font-size:10">First Sign In</th>
+                    						<th style="font-size:10">First Sign Out</th>
+										</t>
+										<t t-if="max_per_day &gt;=2">
+											<th style="font-size:10">Second Sign In</th>
+                    						<th style="font-size:10">Second Sign Out</th>
+										</t>
+										<t t-if="max_per_day &gt;=3">
+											<th style="font-size:10">Third Sign In</th>
+                    						<th style="font-size:10">Third Sign Out</th>
+										</t>
+										<t t-if="max_per_day &gt;=4">
+											<th style="font-size:10">Fourth Sign In</th>
+                    						<th style="font-size:10">Fourth Sign Out</th>
+										</t>
+										<th style="font-size:10">Due</th>
+						                <th style="font-size:10">Working Hours</th>
+						                <th style="font-size:10">Overtime</th>
+						                <th style="font-size:10">Negative</th>
+						                <th style="font-size:10">Leave</th>
+									</tr>
+								</thead>
+							</table>
+						</t>
+					</div>
+				</t>
+			</t>
+		</template>
+	</data>
+</openerp>
