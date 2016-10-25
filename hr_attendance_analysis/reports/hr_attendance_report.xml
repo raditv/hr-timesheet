@@ -18,6 +18,7 @@
 		</record>
 		<record id="action_report_hr_attendance_analysis" model="ir.actions.report.xml">
     		<field name="paperformat_id" ref="swanco_paperformat"/>
+    		<field name="name">hr_attendance_analysis.paper_format</field>
 		</record>
 		<report
 			id="action_report_hr_attendance_analysis"

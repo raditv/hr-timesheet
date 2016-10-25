@@ -170,16 +170,13 @@ class ParticularReport(models.AbstractModel):
                             if (
                                 (
                                     not calendar_attendance.dayofweek
-                                    or
-                                    int(
+                                    or int(
                                         calendar_attendance.dayofweek
                                     ) == current_date.weekday()
                                 )
-                                and
-                                (
+                                and (
                                     not calendar_attendance.date_from
-                                    or
-                                    datetime.strptime(
+                                    or datetime.strptime(
                                         calendar_attendance.date_from,
                                         '%Y-%m-%d'
                                     ) <= current_date
