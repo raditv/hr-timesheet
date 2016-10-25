@@ -171,12 +171,12 @@ class ParticularReport(models.AbstractModel):
                         for calendar_attendance in \
                                 reference_calendar.attendance_ids:
                             if ((not calendar_attendance.dayofweek or
-                                 int(calendar_attendance.dayofweek) == current_date.weekday())
-                                and (not calendar_attendance.date_from
-                                     or datetime.strptime(
-                                         calendar_attendance.date_from,
-                                         '%Y-%m-%d'
-                                     ) <= current_date)):
+                                 int(calendar_attendance.dayofweek) ==
+                                 current_date.weekday()) and
+                            (not calendar_attendance.date_from or
+                                datetime.strptime(
+                                    calendar_attendance.date_from,
+                                    '%Y-%m-%d') <= current_date)):
                                 calendar_attendance_duration = (
                                     attendance_pool.time_difference(
                                         calendar_attendance.hour_from,
