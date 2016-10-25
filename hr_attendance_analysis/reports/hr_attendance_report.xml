@@ -16,10 +16,6 @@
 			<field name="header_spacing">20</field>
 			<field name="dpi">80</field>
 		</record>
-		<record id="action_report_hr_attendance_analysis" model="ir.actions.report.xml">
-    		<field name="paperformat_id" ref="swanco_paperformat"/>
-    		<field name="name">hr_attendance_analysis.paper_format</field>
-		</record>
 		<report
 			id="action_report_hr_attendance_analysis"
 			model="hr.employee"
@@ -27,6 +23,9 @@
 			report_type="qweb-pdf"
 			name="hr_attendance_analysis.hr_attendance_analysis_report"
 			attachment_use="True"/>
+		<record id="action_report_hr_attendance_analysis" model="ir.actions.report.xml">
+    		<field name="paperformat_id" ref="swanco_paperformat"/>
+		</record>
 		<template id="hr_attendance_analysis_report">
 			<t t-call="report.html_container">
 				<t t-call="report.external_layout">
