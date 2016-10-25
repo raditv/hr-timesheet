@@ -28,7 +28,6 @@
             <field name="view_id" ref="wizard_calendar_report"/>
             <field name="target">new</field>
         </record>
-
         <menuitem action="action_wizard_calendar_report"
             id="menu_action_wizard_calendar_report"
             parent="hr.menu_hr_reporting"

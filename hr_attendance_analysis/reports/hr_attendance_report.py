@@ -1,7 +1,7 @@
+# -*- coding: utf-8 -*-
 import math
-import calendar
 import pytz
-from datetime import date, time, datetime, timedelta
+from datetime import time, datetime, timedelta
 from openerp import api, models, fields, exceptions
 from openerp.tools.translate import _
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
@@ -63,15 +63,17 @@ class ParticularReport(models.AbstractModel):
         if context is None:
             context = {}
         report_obj = self.env['report']
-        report = report_obj._get_report_from_name('hr_attendance_analysis.hr_attendance_analysis_report')
-        report_param = self.env['attendance_analysis.wizard.calendar_report'].browse(context.get('active_id'))
+        report = report_obj._get_report_from_name(
+            'hr_attendance_analysis.hr_attendance_analysis_report')
+        report_param = self.env['attendance_analysis.wizard.calendar_report'].browse(
+            context.get('active_id'))
         attendance_pool = self.env['hr.attendance']
         holidays_pool = self.env['hr.holidays']
         precision = self.env['res.users'].browse(
             self.env.user.id).company_id.working_time_precision
         active_tz = pytz.timezone(
             context.get("tz", "UTC") if context else "UTC")
-        
+
         days_by_employee = {}
         from_date = datetime.strptime(report_param.from_date, '%Y-%m-%d')
         to_date = datetime.strptime(report_param.to_date, '%Y-%m-%d')
@@ -135,10 +137,10 @@ class ParticularReport(models.AbstractModel):
                     for attendance in sorted(attendance_pool.browse(attendance_ids.id), key=lambda x: x['name']):
                         attendance_start = datetime.strptime(
                             attendance.name, '%Y-%m-%d %H:%M:%S'
-                            ).replace(tzinfo=pytz.utc).astimezone(active_tz)
+                        ).replace(tzinfo=pytz.utc).astimezone(active_tz)
                         attendance_end = datetime.strptime(
                             attendance.end_datetime, '%Y-%m-%d %H:%M:%S'
-                            ).replace(tzinfo=pytz.utc).astimezone(active_tz)
+                        ).replace(tzinfo=pytz.utc).astimezone(active_tz)
 
                         days_by_employee[employee_id][str_current_date][
                             'signin_'+str(count)] = '%02d:%02d' % (
@@ -157,7 +159,8 @@ class ParticularReport(models.AbstractModel):
                     'overtime'
                 ] = current_total_overtime
 
-                reference_calendar = attendance_pool.get_reference_calendar(employee_id, date=str_current_date)
+                reference_calendar = attendance_pool.get_reference_calendar(
+                    employee_id, date=str_current_date)
                 # computing due total
                 if reference_calendar:
                     if reference_calendar.attendance_ids:
@@ -189,7 +192,7 @@ class ParticularReport(models.AbstractModel):
                                         help_message=(
                                             'Calendar attendance ID %s'
                                             % calendar_attendance.id))
-                                    )
+                                )
                                 if calendar_attendance_duration < 0:
                                     raise exceptions.Warning(
                                         _('Error'),
@@ -262,7 +265,7 @@ class ParticularReport(models.AbstractModel):
                             centered_holiday,
                             weekday_char,
                             reference_calendar.id
-                            )
+                        )
                         if len(matched_schedule_ids) > 1:
                             raise exceptions.Warning(
                                 _('Error'),
@@ -290,7 +293,7 @@ class ParticularReport(models.AbstractModel):
                 else:
                     days_by_employee[employee_id][str_current_date][
                         'negative'
-                        ] = attendance_pool.time_difference(
+                    ] = attendance_pool.time_difference(
                         current_total_inside_calendar, due_minus_leaves,
                         help_message='Employee ID %s. Date %s' % (
                             employee_id, str_current_date))
@@ -335,7 +338,8 @@ class ParticularReport(models.AbstractModel):
                         totals_by_employee[employee_id]['total_due'],
                         days_by_employee[employee_id][str_date]['due'])
                 # computing overtime types
-                reference_calendar = attendance_pool.get_reference_calendar(employee_id, date=str_date)
+                reference_calendar = attendance_pool.get_reference_calendar(
+                    employee_id, date=str_date)
                 if reference_calendar:
                     if reference_calendar.overtime_type_ids:
                         sorted_types = sorted(
