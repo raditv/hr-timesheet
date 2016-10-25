@@ -136,7 +136,8 @@ class ParticularReport(models.AbstractModel):
                 if len(attendance_ids) < 5:
                     count = 1
                     for attendance in sorted(
-                        attendance_pool.browse(attendance_ids.id), key=lambda x: x['name']):
+                        attendance_pool.browse(attendance_ids.id),
+                        key=lambda x: x['name']):
                         attendance_start = datetime.strptime(
                             attendance.name, '%Y-%m-%d %H:%M:%S'
                         ).replace(tzinfo=pytz.utc).astimezone(active_tz)
@@ -429,4 +430,6 @@ class ParticularReport(models.AbstractModel):
             'max_per_day': max_number_of_attendances_per_day,
             'month_name': self._get_month_name,
         }
-        return report_obj.render('hr_attendance_analysis.hr_attendance_analysis_report', docargs)
+        return report_obj.render(
+            'hr_attendance_analysis.hr_attendance_analysis_report',
+            docargs)
