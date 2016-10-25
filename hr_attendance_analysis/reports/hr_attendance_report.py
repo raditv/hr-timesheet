@@ -173,8 +173,8 @@ class ParticularReport(models.AbstractModel):
                             if ((not calendar_attendance.dayofweek or
                                  int(calendar_attendance.dayofweek) ==
                                  current_date.weekday()) and
-                            (not calendar_attendance.date_from or
-                                datetime.strptime(
+                                (not calendar_attendance.date_from or
+                                 datetime.strptime(
                                     calendar_attendance.date_from,
                                     '%Y-%m-%d') <= current_date)):
                                 calendar_attendance_duration = (
@@ -232,8 +232,8 @@ class ParticularReport(models.AbstractModel):
                         tzinfo=pytz.utc).astimezone(active_tz)
                     duration_delta = date_to - date_from
                     duration = (
-                        attendance_pool.total_seconds(duration_delta)
-                        / 60.0 / 60.0
+                        attendance_pool.total_seconds(
+                            duration_delta)/60.0/60.0
                     )
                     intervals_within = 0
                     splitted_holidays = (
@@ -253,7 +253,8 @@ class ParticularReport(models.AbstractModel):
                         # schedule
                         weekday_char = str(
                             unichr(centered_holiday.weekday() + 48))
-                        matched_schedule_ids = attendance_pool.matched_schedule(
+                        matched_schedule_ids =
+                        attendance_pool.matched_schedule(
                             centered_holiday,
                             weekday_char,
                             reference_calendar.id
