@@ -68,7 +68,7 @@ class ParticularReport(models.AbstractModel):
         report_param = self.env[
             'attendance_analysis.wizard.calendar_report'].browse(
             context.get('active_id'))
-        attendance_pool = self.env['hr.attendance']
+        attd = self.env['hr.attendance']
         holidays_pool = self.env['hr.holidays']
         precision = self.env['res.users'].browse(
             self.env.user.id).company_id.working_time_precision
@@ -117,26 +117,26 @@ class ParticularReport(models.AbstractModel):
                 str_current_date_end = (
                     current_date_end_utc.strftime('%Y-%m-%d %H:%M:%S'))
 
-                attendance_ids = attendance_pool.search([
+                attendance_ids = attd.search([
                     ('employee_id', '=', employee_id),
                     ('name', '>=', str_current_date_beginning),
                     ('name', '<=', str_current_date_end),
                     ('action', '=', 'sign_in')])
                 # computing attendance totals
-                for attendance in attendance_pool.browse(attendance_ids.id):
-                    current_total_attendances = attendance_pool.time_sum(
+                for attendance in attd.browse(attendance_ids.id):
+                    current_total_attendances = attd.time_sum(
                         current_total_attendances, attendance.duration)
-                    current_total_overtime = attendance_pool.time_sum(
+                    current_total_overtime = attd.time_sum(
                         current_total_overtime,
                         attendance.outside_calendar_duration)
-                    current_total_inside_calendar = attendance_pool.time_sum(
+                    current_total_inside_calendar = attd.time_sum(
                         current_total_inside_calendar,
                         attendance.inside_calendar_duration)
                 # printing up to 4 attendances
                 if len(attendance_ids) < 5:
                     count = 1
                     for attendance in sorted(
-                            attendance_pool.browse(attendance_ids.id),
+                            attd.browse(attendance_ids.id),
                             key=lambda x: x['name']):
                         attendance_start = datetime.strptime(
                             attendance.name, '%Y-%m-%d %H:%M:%S'
@@ -162,7 +162,7 @@ class ParticularReport(models.AbstractModel):
                     'overtime'
                 ] = current_total_overtime
 
-                reference_calendar = attendance_pool.get_reference_calendar(
+                reference_calendar = attd.get_reference_calendar(
                     employee_id, date=str_current_date)
                 # computing due total
                 if reference_calendar:
@@ -178,7 +178,7 @@ class ParticularReport(models.AbstractModel):
                                     calendar_attendance.date_from,
                                     '%Y-%m-%d') <= current_date)):
                                 calendar_attendance_duration = (
-                                    attendance_pool.time_difference(
+                                    attd.time_difference(
                                         calendar_attendance.hour_from,
                                         calendar_attendance.hour_to,
                                         help_message=(
@@ -191,7 +191,7 @@ class ParticularReport(models.AbstractModel):
                                         _("%s: 'Work to' is < 'Work from'")
                                         % calendar_attendance.name)
                                 current_total_due = \
-                                    attendance_pool.time_sum(
+                                    attd.time_sum(
                                         current_total_due,
                                         calendar_attendance_duration)
                 days_by_employee[employee_id][
@@ -232,19 +232,19 @@ class ParticularReport(models.AbstractModel):
                         tzinfo=pytz.utc).astimezone(active_tz)
                     duration_delta = date_to - date_from
                     duration = (
-                        attendance_pool.total_seconds(
+                        attd.total_seconds(
                             duration_delta)/60.0/60.0
                     )
                     intervals_within = 0
                     splitted_holidays = (
-                        attendance_pool.split_interval_time_by_precision(
+                        attd.split_interval_time_by_precision(
                             date_from, duration, precision)
                     )
                     counter = 0
                     for atomic_holiday in splitted_holidays:
                         counter += 1
                         centered_holiday = (
-                            attendance_pool.mid_time_interval(
+                            attd.mid_time_interval(
                                 atomic_holiday[0],
                                 delta=atomic_holiday[1],
                             )
@@ -253,8 +253,7 @@ class ParticularReport(models.AbstractModel):
                         # schedule
                         weekday_char = str(
                             unichr(centered_holiday.weekday() + 48))
-                        matched_schedule_ids =
-                        attendance_pool.matched_schedule(
+                        matched_schedule_ids = attd.matched_schedule(
                             centered_holiday,
                             weekday_char,
                             reference_calendar.id
@@ -276,7 +275,7 @@ class ParticularReport(models.AbstractModel):
                     days_by_employee[employee_id][str_current_date][
                         'leaves'
                     ] = days_by_employee[employee_id][str_current_date]['due']
-                due_minus_leaves = attendance_pool.time_difference(
+                due_minus_leaves = attd.time_difference(
                     current_total_leaves, current_total_due,
                     help_message='Employee ID %s. Date %s' % (
                         employee_id, str_current_date))
@@ -286,7 +285,7 @@ class ParticularReport(models.AbstractModel):
                 else:
                     days_by_employee[employee_id][str_current_date][
                         'negative'
-                    ] = attendance_pool.time_difference(
+                    ] = attd.time_difference(
                         current_total_inside_calendar, due_minus_leaves,
                         help_message='Employee ID %s. Date %s' % (
                             employee_id, str_current_date))
@@ -311,27 +310,27 @@ class ParticularReport(models.AbstractModel):
             }
             for str_date in days_by_employee[employee_id]:
                 totals_by_employee[employee_id]['total_attendances'] = \
-                    attendance_pool.time_sum(
+                    attd.time_sum(
                         totals_by_employee[employee_id]['total_attendances'],
                         days_by_employee[employee_id][str_date]['attendances'])
                 totals_by_employee[employee_id]['total_overtime'] = \
-                    attendance_pool.time_sum(
+                    attd.time_sum(
                         totals_by_employee[employee_id]['total_overtime'],
                         days_by_employee[employee_id][str_date]['overtime'])
                 totals_by_employee[employee_id]['total_negative'] = \
-                    attendance_pool.time_sum(
+                    attd.time_sum(
                         totals_by_employee[employee_id]['total_negative'],
                         days_by_employee[employee_id][str_date]['negative'])
                 totals_by_employee[employee_id]['total_leaves'] = \
-                    attendance_pool.time_sum(
+                    attd.time_sum(
                         totals_by_employee[employee_id]['total_leaves'],
                         days_by_employee[employee_id][str_date]['leaves'])
                 totals_by_employee[employee_id]['total_due'] = \
-                    attendance_pool.time_sum(
+                    attd.time_sum(
                         totals_by_employee[employee_id]['total_due'],
                         days_by_employee[employee_id][str_date]['due'])
                 # computing overtime types
-                reference_calendar = attendance_pool.get_reference_calendar(
+                reference_calendar = attd.get_reference_calendar(
                     employee_id, date=str_date)
                 if reference_calendar:
                     if reference_calendar.overtime_type_ids:
@@ -349,66 +348,66 @@ class ParticularReport(models.AbstractModel):
                                 if current_overtime <= overtime_type.limit or \
                                         not overtime_type.limit:
                                     emp['total_types'][overtime_type.name] = \
-                                        attendance_pool.time_sum(
+                                        attd.time_sum(
                                             emp['total_types']
                                             [overtime_type.name],
                                             current_overtime)
                                     current_overtime = 0.0
                                 else:
                                     emp['total_types'][overtime_type.name] = \
-                                        attendance_pool.time_sum(
+                                        attd.time_sum(
                                             emp['total_types']
                                             [overtime_type.name],
                                             overtime_type.limit)
                                     current_overtime = \
-                                        attendance_pool.time_difference(
+                                        attd.time_difference(
                                             overtime_type.limit,
                                             current_overtime)
                 days_by_employee[employee_id][str_date][
                     'attendances'
-                ] = attendance_pool.float_time_convert(
+                ] = attd.float_time_convert(
                     days_by_employee[employee_id][str_date]['attendances'])
                 days_by_employee[employee_id][str_date][
                     'overtime'
-                ] = attendance_pool.float_time_convert(
+                ] = attd.float_time_convert(
                     days_by_employee[employee_id][str_date]['overtime'])
                 days_by_employee[employee_id][str_date][
                     'negative'
-                ] = attendance_pool.float_time_convert(
+                ] = attd.float_time_convert(
                     days_by_employee[employee_id][str_date]['negative'])
                 days_by_employee[employee_id][str_date][
                     'leaves'
-                ] = attendance_pool.float_time_convert(
+                ] = attd.float_time_convert(
                     days_by_employee[employee_id][str_date]['leaves'])
                 days_by_employee[employee_id][str_date][
                     'due'
-                ] = attendance_pool.float_time_convert(
+                ] = attd.float_time_convert(
                     days_by_employee[employee_id][str_date]['due'])
             totals_by_employee[employee_id][
                 'total_attendances'
-            ] = attendance_pool.float_time_convert(
+            ] = attd.float_time_convert(
                 totals_by_employee[employee_id]['total_attendances'])
             totals_by_employee[employee_id][
                 'total_overtime'
-            ] = attendance_pool.float_time_convert(
+            ] = attd.float_time_convert(
                 totals_by_employee[employee_id]['total_overtime'])
             totals_by_employee[employee_id][
                 'total_negative'
-            ] = attendance_pool.float_time_convert(
+            ] = attd.float_time_convert(
                 totals_by_employee[employee_id]['total_negative'])
             totals_by_employee[employee_id][
                 'total_leaves'
-            ] = attendance_pool.float_time_convert(
+            ] = attd.float_time_convert(
                 totals_by_employee[employee_id]['total_leaves'])
             totals_by_employee[employee_id][
                 'total_due'
-            ] = attendance_pool.float_time_convert(
+            ] = attd.float_time_convert(
                 totals_by_employee[employee_id]['total_due'])
             for overtime_type in \
                     totals_by_employee[employee_id]['total_types']:
                 totals_by_employee[employee_id]['total_types'][
                     overtime_type
-                ] = attendance_pool.float_time_convert(
+                ] = attd.float_time_convert(
                     totals_by_employee[employee_id]['total_types']
                     [overtime_type])
         docargs = {
