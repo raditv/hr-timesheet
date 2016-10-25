@@ -66,7 +66,7 @@ class ParticularReport(models.AbstractModel):
         report = report_obj._get_report_from_name(
             'hr_attendance_analysis.hr_attendance_analysis_report')
         report_param = self.env[
-        'attendance_analysis.wizard.calendar_report'].browse(
+            'attendance_analysis.wizard.calendar_report'].browse(
             context.get('active_id'))
         attendance_pool = self.env['hr.attendance']
         holidays_pool = self.env['hr.holidays']
@@ -136,8 +136,8 @@ class ParticularReport(models.AbstractModel):
                 if len(attendance_ids) < 5:
                     count = 1
                     for attendance in sorted(
-                        attendance_pool.browse(attendance_ids.id),
-                        key=lambda x: x['name']):
+                            attendance_pool.browse(attendance_ids.id),
+                            key=lambda x: x['name']):
                         attendance_start = datetime.strptime(
                             attendance.name, '%Y-%m-%d %H:%M:%S'
                         ).replace(tzinfo=pytz.utc).astimezone(active_tz)
@@ -170,21 +170,13 @@ class ParticularReport(models.AbstractModel):
                         current_total_due = 0.0
                         for calendar_attendance in \
                                 reference_calendar.attendance_ids:
-                            if (
-                                (
-                                    not calendar_attendance.dayofweek
-                                    or int(
-                                        calendar_attendance.dayofweek
-                                    ) == current_date.weekday()
-                                )
-                                and (
-                                    not calendar_attendance.date_from
-                                    or datetime.strptime(
-                                        calendar_attendance.date_from,
-                                        '%Y-%m-%d'
-                                    ) <= current_date
-                                )
-                            ):
+                            if ((not calendar_attendance.dayofweek or
+                                 int(calendar_attendance.dayofweek) == current_date.weekday())
+                                and (not calendar_attendance.date_from
+                                     or datetime.strptime(
+                                         calendar_attendance.date_from,
+                                         '%Y-%m-%d'
+                                     ) <= current_date)):
                                 calendar_attendance_duration = (
                                     attendance_pool.time_difference(
                                         calendar_attendance.hour_from,

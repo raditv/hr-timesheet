@@ -20,4 +20,7 @@ class HrAttendanceAnalysisReport(models.TransientModel):
             'model': 'hr.employee',
             'form': data
         }
-        return self.env['report'].get_action(self, 'hr_attendance_analysis.hr_attendance_analysis_report', data=datas)
+        return self.env['report'].get_action(
+            self,
+            'hr_attendance_analysis.hr_attendance_analysis_report',
+            data=datas)
